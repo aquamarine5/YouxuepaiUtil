@@ -1,12 +1,12 @@
 # EbagUtil
 用于优学派的简易无需登录验证的爬虫工具
-# 关于作者
+## 关于作者
 一个使用优学派服务的在校初三生，在初二暑假开始写此脚本
-# 需要的Python包
+## 需要的Python包
 - `requests`
-# 关于历史
+## 关于历史
 - 可在[我最早的Repo](https://github.com/awesomehhhhh/AwesomeBot/blob/master/python/webyxp.py)内查看
-# 帮助&功能
+## 帮助&功能
 
 *(yxp内容无需登录验证，所以请慎用于开玩笑）*  
 - python webyxp.py yxpRs 1585745 最新  
@@ -33,15 +33,15 @@
 - python webyxp.py yxpBk 1585745  
 看所用书籍并保存第一张课本图片（见\Temp\Image）  
 
-# 脚本需要在`powershell/cmd`下运行，或者把`is_pydroid`设置`true`然后在arg或argM下写命令。
+## 脚本需要在`powershell/cmd`下运行，或者把`is_pydroid`设置`true`然后在arg或argM下写命令。
 
-# （webyxp）如果有时间就实现：
+### （webyxp）如果有时间就实现：
 
 - [ ] 每日一题（取好题/错题本信息）
 - [ ] 看所有作业的分数而不局限于已批改  
 - [ ] 作业互评  
 
-# （webyxp）暂时无法实现：  
+### （webyxp）暂时无法实现：  
 
 ### 需要获取与uid所关联的设备id的api但没有找到：  
 - [ ] id所在学校  
