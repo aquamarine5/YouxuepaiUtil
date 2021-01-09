@@ -49,7 +49,7 @@ def yxpName(uid: str) -> str:
     urlN = "http://e.anoah.com/api/?q=json/ebag/user/score/score_rank&info={\"userid\":%s}&pmatsemit=%s" % (
         uid, str(yxpTimeGet()))
     _ = loads(requests.get(urlN).text)["recordset"]["real_name"]
-    if _ is "":
+    if _ == "":
         raise WebyxpException(uid, None, 1529, "", "_yxpName")
     return _
 
@@ -68,7 +68,7 @@ def yxpClassId(uid: str) -> str:
 
 
 def yxpToText(inp) -> str:
-    inp = re.sub(r"<(.*?>|<(.*?/>", "", inp)
+    inp = re.sub(r"<(.*?)>|<(.*?)/>", "", inp)
     return re.sub(r"&nbsp;", " ", inp)
 #######################################################
 
@@ -251,7 +251,9 @@ class webyxp():  # 优 学 派 爬 虫#
                 if isWrite:
                     with open(r"python\Temp\FacePrivate.jpg", "wb+") as f:
                         f.write(Pic2.content)
-                text = yxpName(arg[2])
+                        text = yxpName(arg[2])
+                else:
+                    text = f"{yxpName(arg[2])}||{urlPic2}"
 #######################################################
             elif arg[1] == "yxpInfo":  # 返回关于账号大量信息
                 time = yxpTimeGet()
@@ -318,7 +320,7 @@ class webyxp():  # 优 学 派 爬 虫#
             if arg[1] == "yxpRs":  # 返回已批改成绩
                 Classid = yxpClassId(arg[2])
                 if(arg[3] == "最新"):
-                    text = "这是 "+yxpName(arg[2])+"的全科最近分数（仅显示已批改）：\n"
+                    text = "这是"+yxpName(arg[2])+"的全科最近分数（仅显示已批改）：\n"
                     for i in range(13):
                         url = "http://e.anoah.com/api/?q=json/ebag5/Statistics/getStudentScoreInfo&info="\
                             "{\"user_id\":%s,\"class_id\":\"%s\",\"type\":0,\"subject_id\":%s,\"pagesize\":1,\"page\":1,\"start_date\":\"\",\"end_date\":\"\"}&pmatsemit=%s" %\
