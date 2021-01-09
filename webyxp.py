@@ -11,16 +11,17 @@ else:
 
 
 class WebyxpException(Exception):
-    def __init__(self, uid: Optional[int], name: Optional[str], typee: int, message: str, functionName: str):
+    def __init__(self, uid: int, name: Optional[str], typee: int, message: str, functionName: str):
         _allowErrorType: List[int] = [
             0,  # Any: ?
             1524,  # yxpDCom: Can't find the homework
             1529,  # _yxpName: This user no name
             1534,  # yxpBk: This user don't use book to study
             1547,  # yxpLt: No teacher's discuss
+            1800,  # yxpRs: No score can find
         ]
 
-        self.uid: Optional[int] = uid
+        self.uid: int = uid
         self.name: Optional[str] = name
         self.functionName: str = functionName
         if typee not in _allowErrorType:
@@ -32,12 +33,20 @@ class WebyxpException(Exception):
     def __str__(self):
         _errorMessage: Dict[int, str] = {
             0: "",
-            1524: "找不到dcom_id为#code#的作业",
+            1524: "找不到dcom_id为 #code# 的作业",
             1529: "uid为#code#的人没有名字",
             1534: "#name#没有用课本来学习",
-            1547: "#name#没有老师评语"
+            1547: "#name#没有老师评语",
+            1800: "#name#没有已批改成绩"
         }
-        return f"{_errorMessage[self.type]}"
+        name: str = ""
+        if self.name is None:
+            name = self.uid
+        else:
+            name = self.name
+        errorMessage = _errorMessage[self.type].replace(
+            "#name#", name).replace("#code#", self.uid)
+        return f"来自{self.functionName}的错误：{errorMessage}{self.message}"
 
 
 def yxpTimeGet() -> str:
@@ -55,7 +64,7 @@ def yxpName(uid: str) -> str:
 
 
 def yxpClassId(uid: str) -> str:
-    urlClass = "http://e.anoah.com/api/?q=json/ebag5/User/getUserClasses&info={\"userid\":%s}&pmatsemit=%s" % (
+    urlClass = "http://e.anoah.com/api/?q=json/ebag5/User/getAllClasses&info={\"userid\":%s}&pmatsemit=%s" % (
         uid, yxpTimeGet())
     cclass = loads(requests.get(urlClass).text)["recordset"]
     classScore = ""
@@ -89,7 +98,7 @@ class webyxp():  # 优 学 派 爬 虫#
                 url = "http://e.anoah.com/api_cache/?q=json/icom/Dcom/getDCom&info={\"dcom_id\":%s}" % arg[2]
                 out = loads(requests.get(url).text)
                 if "status" in out:
-                    raise WebyxpException(None, None, 1524, "", "yxpDCom")
+                    raise WebyxpException(arg[2], None, 1524, "", "yxpDCom")
                 else:
                     text = "优学派作业ID：%s\n创建时间：%s\n作业名称：%s\n作业标题：%s\n活动名称：%s\n描述：%s" %\
                         (out["id"], out["create_time"], out["dcom_name"],
@@ -147,7 +156,8 @@ class webyxp():  # 优 学 派 爬 虫#
                                 outFL[i]["title"]+" "+outFL[i]["teacher_name"] + \
                                 "\n老师评语："+commentText+"\n"
                 if textHave == 0:
-                    text = text+"无老师作业评语。"
+                    raise WebyxpException(
+                        arg[2], yxpName(arg[2]), 1547, "", "yxpLt")
 #######################################################
             elif arg[1] == "yxpCt":  # 返回课程表
                 url = "http://api2.anoah.com/jwt/user/classes/getWithUser?user_id=%s&pmatsemit=%s" % (
@@ -272,7 +282,7 @@ class webyxp():  # 优 学 派 爬 虫#
                     (arg[2], yxpClassId(arg[2]), time)
                 urlHtCt = "http://e.anoah.com/api/?q=json/ebag5/Qtibook/favoritewrongCount&info={\"user_id\":\"%s\",\"class_id\":\"%s\"}" %\
                     (arg[2], yxpClassId(arg[2]))
-                urlGood = "e.anoah.com/api/?q=json/ebag5/User/getUserPraise&info={\"user_id\":\"%s\",\"from\":\"\",\"to\":\"\",\"class_id\":\"%s\"}" %\
+                urlGood = "http://e.anoah.com/api/?q=json/ebag5/User/getUserPraise&info={\"user_id\":\"%s\",\"from\":\"\",\"to\":\"\",\"class_id\":\"%s\"}" %\
                     (arg[2], yxpClassId(arg[2]))
                 # ---------------------------------------------
                 Class = loads(requests.get(urlClass).text)["recordset"]
