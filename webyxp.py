@@ -1,63 +1,75 @@
 import requests
+import re
 import sys
 from json import loads
-
+from typing import List,Dict,Optional
 is_pydroid = False
 if(is_pydroid):
     argM = "python yxpRs 1585738 最新".split(" ")
 else:
     argM = sys.argv
 
-
-def yxpTimeGet():
+class WebyxpException(Exception):
+    def __init__(self,uid:Optional[int],name:Optional[str],typee:int,message:str,functionName:str):
+        _allowErrorType:List[int]=[
+            0,    #Any: ?
+            1524, #yxpDCom: Can't find the homework
+            1529, #_yxpName: This user no name
+            1534, #yxpBk: This user don't use book to study
+            1547, #yxpLt: No teacher's discuss
+        ]
+        
+        self.uid:Optional[int]=uid
+        self.name:Optional[str]=name
+        self.functionName:str=functionName
+        if typee not in _allowErrorType:
+            raise ValueError(f"错误类型只能是{_allowErrorType}")
+        else:
+            self.type:int=typee
+        self.message:str=message
+    def __str__(self):
+        _errorMessage:Dict[int,str]={
+            0:"",
+            1524:"找不到dcom_id为#code#的作业",
+            1529:"uid为#code#的人没有名字",
+            1534:"#name#没有用课本来学习",
+            1547:"#name#没有老师评语"
+        }
+        return f"{_errorMessage[self.type]}"
+def yxpTimeGet()->str:
     urlT = "http://e.anoah.com/api_dist/?q=json/ebag/System/getServerTime&info={}"
     return loads(requests.get(urlT).text)["recordset"]["system_time"]
 
 
-def yxpName(uid):
+def yxpName(uid:str)->str:
     urlN = "http://e.anoah.com/api/?q=json/ebag/user/score/score_rank&info={\"userid\":%s}&pmatsemit=%s" % (
         uid, str(yxpTimeGet()))
-    return loads(requests.get(urlN).text)["recordset"]["real_name"]
+    _=loads(requests.get(urlN).text)["recordset"]["real_name"]
+    if _ is "":raise WebyxpException(uid,None,1529,"","_yxpName")
+    return _
 
 
-def yxpClassId(uid):
+def yxpClassId(uid:str)->str:
     urlClass = "http://e.anoah.com/api/?q=json/ebag5/User/getUserClasses&info={\"userid\":%s}&pmatsemit=%s" % (
         uid, yxpTimeGet())
-    Class = loads(requests.get(urlClass).text)["recordset"]
-    ClassScore = ""
-    for t in range(len(Class)):
+    cclass = loads(requests.get(urlClass).text)["recordset"]
+    classScore = ""
+    for t in range(len(cclass)):
         if t == 0:
-            ClassScore = Class[t]["class_id"]
+            classScore = cclass[t]["class_id"]
         else:
-            ClassScore = str(ClassScore)+","+str(Class[t]["class_id"])
-    return ClassScore
+            classScore = str(classScore)+","+str(cclass[t]["class_id"])
+    return classScore
 
 
-def yxpToText(inp):
-    inp = inp.replace("<p>", "")
-    inp = inp.replace(r"</p>", "")
-    inp = inp.replace("<span class=\"spot\">", "")
-    inp = inp.replace("<span style=\"font-weight:bold\">", "")
-    inp = inp.replace("<span style=\"color:blue\">", "")
-    inp = inp.replace(r"</span>", "")
-    inp = inp.replace("&nbsp;", "")
-    inp = inp.replace("<pos>", "")
-    inp = inp.replace(r"</pos>", "")
-    inp = inp.replace(r"<br  />", "")
-    inp = inp.replace(r"<br />", "")
-    inp = inp.replace('<p align=\"center\">', "")
-    inp = inp.replace("<img", "`")
-    inp = inp.replace(">", "~")
-    s = inp.find("`")
-    e = inp.find("~")
-    if s == -1:
-        inp = inp[:s]+inp[e+1:]
-    return inp
+def yxpToText(inp)->str:
+    inp=re.sub(r"<(.*?>|<(.*?/>","",inp)
+    return re.sub(r"&nbsp;"," ",inp)
 #######################################################
 
 
 class webyxp():  # 优 学 派 爬 虫#
-    def __init__(self, arg):
+    def __init__(self, arg:List[str],isWrite:bool=True):
         subjectList = {"语文": 1, "数学": 2, "英语": 3, "化学": 4, "历史": 5, "地理": 6,
                        "生物": 7, "物理": 8, "美术": 32, "信息": 33, "音乐": 14, "体育": 23, "道法": 437}
         subjectNmList = {"1": "语文", "2": "数学", "3": "英语", "4": "化学", "5": "历史", "6": "地理",
@@ -65,13 +77,14 @@ class webyxp():  # 优 学 派 爬 虫#
         subjectlistNum = [1, 2, 3, 4, 5, 6, 7, 8, 437, 32, 33, 14, 23]
         subjectNamelist = ["语文", "数学", "英语", "化学（测试性功能）",
                            '历史', '地理', '生物', '物理', '道法', '美术', '信息', '音乐', '体育']
+        text:str="?"
 #######################################################
         if len(arg) == 3:
             if arg[1] == "yxpDCom":  # 个人测试
                 url = "http://e.anoah.com/api_cache/?q=json/icom/Dcom/getDCom&info={\"dcom_id\":%s}" % arg[2]
                 out = loads(requests.get(url).text)
                 if "status" in out:
-                    text = "指定的作业不存在"
+                    raise WebyxpException(None,None,1524,"","yxpDCom")
                 else:
                     text = "优学派作业ID：%s\n创建时间：%s\n作业名称：%s\n作业标题：%s\n活动名称：%s\n描述：%s" %\
                         (out["id"], out["create_time"], out["dcom_name"],
@@ -80,31 +93,34 @@ class webyxp():  # 优 学 派 爬 虫#
             elif arg[1] == "yxpBk":  # 返回使用的课本
                 urlClass = "http://e.anoah.com/api/?q=json/ebag5/User/getUserClasses&info="\
                     "{\"userid\":%s}&pmatsemit=%s" % (arg[2], yxpTimeGet())
-                Cs = loads(requests.get(urlClass).text)["recordset"]
-                for t in range(len(Cs)):
+                cs = loads(requests.get(urlClass).text)["recordset"]
+                if len(cs)==0:
+                    raise WebyxpException(arg[2],yxpName(arg[2]),1534,"","yxpBk")
+                for t in range(len(cs)):
                     if t == 0:
-                        Ct = Cs[t]["class_name"]
+                        ct = cs[t]["class_name"]
                     else:
-                        Ct = Ct+"，"+Cs[t]["class_name"]
-                text = "这是%s（%s）使用的所有课本：\n" % (yxpName(arg[2]), Ct)
+                        ct = ct+"，"+cs[t]["class_name"]
+                text = "这是%s（%s）使用的所有课本：\n" % (yxpName(arg[2]), ct)
                 for i in range(len(subjectlistNum)):
                     urlBk = "http://e.anoah.com/api/?q=json/ebag5/Book/getMyBookList&info="\
                         "{\"class_ids\":\"%s\",\"subject_id\":%s,\"page\":1}&pmatsemit=%s" %\
                         (yxpClassId(arg[2]), subjectlistNum[i], yxpTimeGet())
-                    Bk = loads(requests.get(urlBk).text)["recordset"]
+                    bk = loads(requests.get(urlBk).text)["recordset"]
                     text += subjectNamelist[i]+"：\n"
-                    HaveP = False
-                    if len(Bk) == 0:
+                    haveP = False
+                    if len(bk) == 0:
                         text = text+"- 没有课本。\n"
                     else:
-                        for j in range(len(Bk)):
-                            text = text+"- "+Bk[j]["name"]+"\n"
-                            if not Bk[j]["cover_photo"] is None:
-                                if not HaveP:
-                                    with open("python\\Temp\\Image\\%s.jpg" % subjectlistNum[i], "wb+") as f:
-                                        f.write(requests.get(
-                                            Bk[j]["cover_photo"]).content)
-                                        HaveP = True
+                        for j in range(len(bk)):
+                            text = text+"- "+bk[j]["name"]+"\n"
+                            if not bk[j]["cover_photo"] is None:
+                                if not haveP:
+                                    if isWrite:
+                                        with open("python\\Temp\\Image\\%s.jpg" % subjectlistNum[i], "wb+") as f:
+                                            f.write(requests.get(
+                                                bk[j]["cover_photo"]).content)
+                                            haveP = True
 #######################################################
             elif arg[1] == "yxpLt":  # 返回作业评语
                 textHave = 0
@@ -226,8 +242,9 @@ class webyxp():  # 优 学 派 爬 虫#
                     urlPic2 = (urlPic+urlJson).replace(".jpg", "_private.jpg")
                 print(urlPic2)
                 Pic2 = requests.get(urlPic2)
-                with open(r"python\Temp\FacePrivate.jpg", "wb+") as f:
-                    f.write(Pic2.content)
+                if isWrite:
+                    with open(r"python\Temp\FacePrivate.jpg", "wb+") as f:
+                        f.write(Pic2.content)
                 text = yxpName(arg[2])
 #######################################################
             elif arg[1] == "yxpInfo":  # 返回关于账号大量信息
@@ -290,8 +307,6 @@ class webyxp():  # 优 学 派 爬 虫#
         elif len(arg) == 2:
             if arg[1] == "yxpTIME":
                 text = yxpTimeGet()
-            else:
-                text = "Error"
 #######################################################
         elif len(arg) == 4:
             if arg[1] == "yxpRs":  # 返回已批改成绩
@@ -495,9 +510,7 @@ class webyxp():  # 优 学 派 爬 虫#
                                 str(j+1)+" "+subjectId+" " + \
                                 outNok["lists"][j]["title"]+" " + \
                                 outNok["lists"][j]["teacher_name"]+"\n"
-                    text = text + \
-                        "共%s个未写作业。\n可使用 yxp答案 [用户id] [科目] [作业前数字] 查看这个作业的答案" % str(
-                            n)
+                    text = f"{text}共{n}个未写作业。\n可使用 yxp答案 [用户id] [科目] [作业前数字] 查看这个作业的答案"
                     # ---------------------------------------------
                 else:
                     urlNOK = "http://api2.anoah.com/jwt/homework/publish/getListForStudent?"\
@@ -533,7 +546,6 @@ class webyxp():  # 优 学 派 爬 虫#
                                     text = text + \
                                         "☛ 写了的作业（%s个）：\n" % (
                                             okjs["total_count"])
-                                # +"\n作业ID："+lists[i]["course_hour_publish_id"]
                                 text = text+lists[i]["start_time"]+" "+lists[i]["title"] + \
                                     " "+lists[i]["subject_name"] + \
                                     lists[i]["teacher_name"]
@@ -558,7 +570,6 @@ class webyxp():  # 优 学 派 爬 虫#
                                     text = text + \
                                         "☛ 没写的作业（%s个）：\n" % (
                                             nokjs["total_count"])
-                                # +"\n作业ID："+noklists[i]["course_hour_publish_id"]
                                 text = text+noklists[i]["start_time"]+" "+noklists[i]["title"] + \
                                     " "+noklists[i]["subject_name"] + \
                                     noklists[i]["teacher_name"]
@@ -568,23 +579,35 @@ class webyxp():  # 优 学 派 爬 虫#
                                 text = text + \
                                     "※ 仅显示%s个，但一共有%s个作业未完成" % (
                                         nokjs["per_page"], nokjs["total_count"])
-#######################################################
-        else:
-            text = "参数不够"
-        self.text = text
+        self.text : str = text
 
 
 #######################################################
 if __name__ == "__main__":
-    text = webyxp(argM).text
-    try:
-        pass  # text=webyxp(argM).text
-    except BaseException as err:
-        text = "错误：\n"+err
-    with open(r"Temp\temp.txt", "w+", encoding="UTF-8") as f:
-        if(is_pydroid):
-            print(text)
-        else:
-            text = str(text)
-            f.write(text)
-            print(text)
+    if "--diswrite-file" in argM:
+        argM.remove("--diswrite-file")
+        text = webyxp(argM,False).text
+        if text == "?":
+            if(len(argM)<2):
+                functionName="没有指定命令名"
+            else:functionName=argM[1]
+            text=f"参数错误或不正确的命令名，本次执行的命令名为：{functionName}"
+        print(text)
+    else:
+        try:
+            text = webyxp(argM).text
+            if text == "?":
+                if(len(argM)<2):
+                    functionName="没有指定命令名"
+                else:
+                    functionName=argM[1]
+                print(f"参数错误或不正确的命令名，本次执行的命令名为：{functionName}，参数数量为：{len(argM)}")
+            with open(r"Temp\temp.txt", "w+", encoding="UTF-8") as f:
+                if not is_pydroid:
+                    text = str(text)
+                    f.write(text)
+                print(text)
+        except BaseException as err:
+            print(f"错误：\n{str(err)}")
+        
+    
