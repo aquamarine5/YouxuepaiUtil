@@ -1,0 +1,73 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 requests
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --max-complexity=10 --max-line-length=177 --statistics
+    - name: Test function -> yxpDCom
+      run: |
+        python webyxp.py --diswrite-file yxpDCom 1958
+    - name: Test function -> yxpTIME
+      run: |
+        python webyxp.py --diswrite-file yxpTIME
+    - name: Test function -> yxpBk
+      run: |
+        python webyxp.py --diswrite-file yxpBk 1585733
+    - name: Test function -> yxpLt
+      run: |
+        python webyxp.py --diswrite-file yxpLt 1585733
+    - name: Test function -> yxpCt
+      run: |
+        python webyxp.py --diswrite-file yxpCt 1585733
+    - name: Test function -> yxpNm
+      run: |
+        python webyxp.py --diswrite-file yxpNm 1585733
+    - name: Test function -> yxpPic
+      run: |
+        python webyxp.py --diswrite-file yxpPic 1585733
+    - name: Test function -> yxpInfo
+      run: |
+        python webyxp.py --diswrite-file yxpInfo 1585733
+    - name: Test function -> yxpRs (New)
+      run: |
+        python webyxp.py --diswrite-file yxpRs 1585733 最新
+    - name: Test function -> yxpRs (Custom Subject)
+      run: |
+        python webyxp.py --diswrite-file yxpRs 1585733 语文
+    - name: Test function -> yxpAs
+      run: |
+        python webyxp.py --diswrite-file yxpAs 1585733 语文1
+    - name: Test function -> yxpHw (All)
+      run: |
+        python webyxp.py --diswrite-file yxpHw 1585733 没写
+    - name: Test function -> yxpHw (Custom Subject)
+      run: |
+        python webyxp.py --diswrite-file yxpHw 1585735 数学
