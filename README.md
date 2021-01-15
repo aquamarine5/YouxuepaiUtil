@@ -7,7 +7,6 @@
 ## 关于历史
 - 可在[我最早的Repo](https://github.com/awesomehhhhh/AwesomeBot/blob/master/python/webyxp.py)内查看
 ## 帮助&功能
-
 *(yxp内容无需登录验证，所以请慎用于开玩笑）*  
 - python webyxp.py yxpRs 1585745 最新  
 看这个id的最新已批改成绩和班级平均分比较  
@@ -16,6 +15,7 @@
 - python webyxp.py yxpLt 1585733  
 看这个id的所有科目的老师作业评语  
 <font color=red>
+
 - python webyxp.py yxpAs 1585745 语文4  
 看这个id下语文的第4个没写作业的答案  
 **（请勿滥用）**  
