@@ -14,10 +14,9 @@
 看这个id的所有生物已批改成绩和班级平均分比较
 - python webyxp.py yxpLt 1585733  
 看这个id的所有科目的老师作业评语  
-<font color=red>
-
 - python webyxp.py yxpAs 1585745 语文4  
 看这个id下语文的第4个没写作业的答案  
+<font color=red> 
 **（请勿滥用）**  
 </font>
 - python webyxp.py yxpPic 1585745  
