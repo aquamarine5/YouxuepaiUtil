@@ -16,7 +16,7 @@
 看这个id的所有科目的老师作业评语  
 - python webyxp.py yxpAs 1585745 语文4  
 看这个id下语文的第4个没写作业的答案  
-<font color=#0099ff xss=removed>**（请勿滥用）** </font>
+<font color=#FFF68F xss=removed>**（请勿滥用）** </font>
 - python webyxp.py yxpPic 1585745  
 看这个id的私人头像（见\Temp）
 - python webyxp.py yxpInfo 1585745  
