@@ -7,7 +7,7 @@
 ## 关于历史
 - 可在[我最早的Repo](https://github.com/awesomehhhhh/AwesomeBot/blob/master/python/webyxp.py)内查看
 ## 帮助&功能
-*(yxp内容无需登录验证，所以请慎用于开玩笑）*  
+*(优学派内容无需登录验证，所以请慎用于开玩笑）*  
 
 ### 最受欢迎功能（逃）：
 - python webyxp.py yxpAs 1585745 语文4  
