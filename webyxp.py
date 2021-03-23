@@ -13,7 +13,7 @@ else:
 class WebyxpException(Exception):
     def __init__(self, uid: int, name: Optional[str], typee: int, message: str, functionName: str):
         _allowErrorType: List[int] = [
-            0,  # Any: ?
+            0,  # Any: ???
             1524,  # yxpDCom: Can't find the homework
             1529,  # _yxpName: This user no name
             1534,  # yxpBk: This user don't use book to study
