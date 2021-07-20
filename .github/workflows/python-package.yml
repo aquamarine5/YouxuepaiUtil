@@ -66,7 +66,7 @@ jobs:
         python webyxp.py --diswrite-file yxpRs 1585733 语文
     - name: Test function -> yxpAs
       run: |
-        python webyxp.py --diswrite-file yxpAs 1585733 语文1
+        python webyxp.py --diswrite-file yxpAs 1585731 英语1
     - name: Test function -> yxpHw (All)
       run: |
         python webyxp.py --diswrite-file yxpHw 1585733 没写
