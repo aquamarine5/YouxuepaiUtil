@@ -78,13 +78,14 @@ class webyxp():  # 优 学 派 爬 虫#
                         (out["id"], out["create_time"], out["dcom_name"],
                          out["dcom_title"], out["activity_name"], out["description"])
             elif arg[1] =="yxpSCORE_GET":
-                url=r'https://e.anoah.com/api_dist/?q=json/ebag5/User/login&info={%22loginnm%22:%22e1585732%22,%22password%22:%22&MD5%22,%22captcha%22:%22%22,%22captchaid%22:%22%22,%22terminalType%22:%22PC_BROWSER%22}'
+                url=r'https://e.anoah.com/api_dist/?q=json/ebag5/User/login&info={"loginnm":"e1585732","password":"hzD/qhxAexzWTvkWwjZ2HBKJRqM5DI1LpmQ2oEiRs9KFbdrjKvVpIsQ2zAxnnbjvEhtmMhfYSfM80ctuwSsN59XrMu7eDQiSLGRj1mZzpWrqEX725Wg2J3qFh0jOWKV9HhKd7DwHld7HCoGdFxrTEg R0/tVu 7x8HDsp8SOx60=","captcha":"","captchaid":"","terminalType":"PC_BROWSER"}'
                 url=url.replace("&MD5",arg[2].replace("!",""))
                 s=requests.Session()
                 for i in range(4):
                     requests.get(url)
                     sleep(0.2)
-                s.get(url)
+                r=s.get(url)
+                print(url,r.text)
                 for i in range(5):
                     s.get(r"https://www.anoah.com/api/?q=json/ebag5/Qtibook/deleteFavorite&info={%22user_id%22:%221585732%22,%22id_list%22:%229010061585908100001%22,%22course_hour_publish_id%22:%22ee9010041586001600002f%22}")
                     sleep(0.2)
