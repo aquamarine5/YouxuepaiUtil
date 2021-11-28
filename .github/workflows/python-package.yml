@@ -49,6 +49,9 @@ jobs:
     - name: Test function -> yxpCt
       run: |
         python webyxp.py --diswrite-file yxpCt 1585733
+    - name: Get 10xScore -> yxpSCORE_GET
+      run: |
+        python webyxp.py yxpSCORE_GET hzD/qhxAexzWTvkWwjZ2HBKJRqM5DI1LpmQ2oEiRs9KFbdrjKvVpIsQ2zAxnnbjvEhtmMhfYSfM80ctuwSsN59XrMu7eDQiSLGRj1mZzpWrqEX725Wg2J3qFh0jOWKV9HhKd7DwHld7HCoGdFxrTEg!R0/tVu!7x8HDsp8SOx60=
     - name: Test function -> yxpNm
       run: |
         python webyxp.py --diswrite-file yxpNm 1585733
