@@ -597,9 +597,9 @@ class webyxp():  # 优 学 派 爬 虫#
 
 #######################################################
 if __name__ == "__main__":
-    text = webyxp(argM).text
+    #text = webyxp(argM).text
     try:
-        pass  # text=webyxp(argM).text
+        text=webyxp(argM).text
     except BaseException as err:
         text = "错误：\n"+err
     with open(r"temp.txt", "w+", encoding="UTF-8") as f:
