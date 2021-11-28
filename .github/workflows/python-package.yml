@@ -30,10 +30,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 requests
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --max-line-length=177 --statistics
+# Disabled flake8
+#    - name: Lint with flake8
+#      run: |
+#        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+#        flake8 . --max-line-length=177 --statistics
     - name: Test function -> yxpDCom
       run: |
         python webyxp.py --diswrite-file yxpDCom 1958
