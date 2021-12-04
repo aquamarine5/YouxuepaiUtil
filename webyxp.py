@@ -602,10 +602,4 @@ if __name__ == "__main__":
         text=webyxp(argM).text
     except BaseException as err:
         text = "错误：\n"+err
-    with open(r"temp.txt", "w+", encoding="UTF-8") as f:
-        if(is_pydroid):
-            print(text)
-        else:
-            text = str(text)
-            f.write(text)
-            print(text)
+    print(text)
