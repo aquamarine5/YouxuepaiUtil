@@ -1,5 +1,6 @@
 <!--🐮🍺-->
 # YouxuepaiUtil(EbagUtil)
+[![Code lines](https://img.shields.io/tokei/lines/github/awesomehhhhh/YouxuepaiUtil)]()
 用于优学派的简易无需登录验证的爬虫工具
 # 写在最前
 - 代码写的超烂，现在也懒得改，“能用就行”
