@@ -45,7 +45,7 @@
 ## 脚本需要在`powershell/cmd`下运行，或者把`is_pydroid`设置`true`然后在arg或argM下写命令。
 
 ### （webyxp）如果有时间就实现：
-*（tips：毫无时间，欢迎Pull Request）*
+*（tips：<s>毫无时间</s> 懒得做，欢迎Pull Request）*
 
 - [ ] 每日一题（取好题/错题本信息）
 - [ ] 看所有作业的分数而不局限于已批改  
